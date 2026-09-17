@@ -14,12 +14,13 @@ Connects an Azure cloud environment to Aikido Security.
 
 ```terraform
 resource "aikido_cloud_azure" "production" {
-  name            = "Azure Production"
-  environment     = "production"
-  application_id  = "00000000-0000-0000-0000-000000000000"
-  directory_id    = "00000000-0000-0000-0000-000000000000"
-  subscription_id = "00000000-0000-0000-0000-000000000000"
-  key_value       = var.azure_client_secret
+  name              = "Azure Production"
+  environment       = "production"
+  azure_environment = "public"
+  application_id    = "00000000-0000-0000-0000-000000000000"
+  directory_id      = "00000000-0000-0000-0000-000000000000"
+  subscription_id   = "00000000-0000-0000-0000-000000000000"
+  key_value         = var.azure_client_secret
 }
 ```
 
@@ -34,6 +35,10 @@ resource "aikido_cloud_azure" "production" {
 - `key_value` (String, Sensitive) The generated secret for the registered application.
 - `name` (String) A name for this cloud environment.
 - `subscription_id` (String) The relevant Azure Subscription ID.
+
+### Optional
+
+- `azure_environment` (String) The Azure cloud environment. Defaults to `public`.
 
 ### Read-Only
 

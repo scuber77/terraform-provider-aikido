@@ -33,12 +33,13 @@ type CreateAWSCloudRequest struct {
 
 // CreateAzureCloudRequest is the request body for connecting an Azure cloud.
 type CreateAzureCloudRequest struct {
-	Name           string `json:"name"`
-	Environment    string `json:"environment"`
-	ApplicationID  string `json:"application_id"`
-	DirectoryID    string `json:"directory_id"`
-	SubscriptionID string `json:"subscription_id"`
-	KeyValue       string `json:"key_value"`
+	Name             string `json:"name"`
+	Environment      string `json:"environment"`
+	AzureEnvironment string `json:"azure_environment"`
+	ApplicationID    string `json:"application_id"`
+	DirectoryID      string `json:"directory_id"`
+	SubscriptionID   string `json:"subscription_id"`
+	KeyValue         string `json:"key_value"`
 }
 
 // CreateGCPCloudRequest is the request body for connecting a GCP cloud.

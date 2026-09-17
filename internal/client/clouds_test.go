@@ -96,8 +96,16 @@ func TestCreateAWSCloud(t *testing.T) {
 
 func TestCreateAzureCloud(t *testing.T) {
 	server, c := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("expected POST, got %s", r.Method)
+		}
 		if r.URL.Path != "/api/public/v1/clouds/azure" {
 			t.Errorf("unexpected path: %s", r.URL.Path)
+		}
+		var req CreateAzureCloudRequest
+		mustDecode(t, r, &req)
+		if req.AzureEnvironment != "public" {
+			t.Errorf("expected azure_environment 'public', got %q", req.AzureEnvironment)
 		}
 		w.WriteHeader(http.StatusOK)
 		mustEncode(t, w, CreateCloudResponse{ID: 43})
@@ -105,12 +113,13 @@ func TestCreateAzureCloud(t *testing.T) {
 	defer server.Close()
 
 	id, err := c.CreateAzureCloud(context.Background(), CreateAzureCloudRequest{
-		Name:           "test-azure",
-		Environment:    "staging",
-		ApplicationID:  "app-id",
-		DirectoryID:    "dir-id",
-		SubscriptionID: "sub-id",
-		KeyValue:       "secret",
+		Name:             "test-azure",
+		Environment:      "staging",
+		AzureEnvironment: "public",
+		ApplicationID:    "app-id",
+		DirectoryID:      "dir-id",
+		SubscriptionID:   "sub-id",
+		KeyValue:         "secret",
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

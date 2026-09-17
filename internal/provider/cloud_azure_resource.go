@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -32,14 +33,15 @@ type CloudAzureResource struct {
 
 // CloudAzureResourceModel describes the resource data model.
 type CloudAzureResourceModel struct {
-	ID             types.String `tfsdk:"id"`
-	Name           types.String `tfsdk:"name"`
-	Environment    types.String `tfsdk:"environment"`
-	ApplicationID  types.String `tfsdk:"application_id"`
-	DirectoryID    types.String `tfsdk:"directory_id"`
-	SubscriptionID types.String `tfsdk:"subscription_id"`
-	KeyValue       types.String `tfsdk:"key_value"`
-	ExternalID     types.String `tfsdk:"external_id"`
+	ID               types.String `tfsdk:"id"`
+	Name             types.String `tfsdk:"name"`
+	Environment      types.String `tfsdk:"environment"`
+	AzureEnvironment types.String `tfsdk:"azure_environment"`
+	ApplicationID    types.String `tfsdk:"application_id"`
+	DirectoryID      types.String `tfsdk:"directory_id"`
+	SubscriptionID   types.String `tfsdk:"subscription_id"`
+	KeyValue         types.String `tfsdk:"key_value"`
+	ExternalID       types.String `tfsdk:"external_id"`
 }
 
 func (r *CloudAzureResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -73,6 +75,15 @@ func (r *CloudAzureResource) Schema(ctx context.Context, req resource.SchemaRequ
 				},
 				Validators: []validator.String{
 					stringvalidator.OneOf("production", "staging", "development", "mixed"),
+				},
+			},
+			"azure_environment": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString("public"),
+				MarkdownDescription: "The Azure cloud environment. Defaults to `public`.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"application_id": schema.StringAttribute{
@@ -141,12 +152,13 @@ func (r *CloudAzureResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 
 	cloudID, err := r.client.CreateAzureCloud(ctx, client.CreateAzureCloudRequest{
-		Name:           data.Name.ValueString(),
-		Environment:    data.Environment.ValueString(),
-		ApplicationID:  data.ApplicationID.ValueString(),
-		DirectoryID:    data.DirectoryID.ValueString(),
-		SubscriptionID: data.SubscriptionID.ValueString(),
-		KeyValue:       data.KeyValue.ValueString(),
+		Name:             data.Name.ValueString(),
+		Environment:      data.Environment.ValueString(),
+		AzureEnvironment: data.AzureEnvironment.ValueString(),
+		ApplicationID:    data.ApplicationID.ValueString(),
+		DirectoryID:      data.DirectoryID.ValueString(),
+		SubscriptionID:   data.SubscriptionID.ValueString(),
+		KeyValue:         data.KeyValue.ValueString(),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError("Error Creating Azure Cloud", fmt.Sprintf("Unable to create Azure cloud: %s", err))
